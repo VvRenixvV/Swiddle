@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href='./assets/style.css' />
+  
+  <script type='module' src="./assets/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+  
+  <title>Swiddle</title>
+</head>
+<body>
+  <div id='container'>
+    <h1>SWIDDLE!!!</h1>
+    <canvas id='screen' width="800" height="400"> 
+    </canvas> 
+    </br>
+    <button id='reset'>Reset</button>
+    <button id='erase'>Erase</button>
+    <button id='paint'>Paint</button>
+    </br>
+  </div>
+  
+  <h3>
+  <label for="weight" id="w_label">Brush Weight: 5px</label>
+  <input type="range" id='weight' min="1" max="20" value="5"/>
+  </br></br>
+  <label for="colorPicker" id="c_label">Color Picker:</label>
+  <input type='color' id='color' width='30'/>
+  </h3>
+</body>
+</html>
