@@ -1,15 +1,11 @@
 let socket;
 socket = io.connect('http://localhost:3000');
 
-let draws = []
-socket.on('mousedraw', function(data){
-  draws.push(data);
-});
 
+socket.on('draw', function(data) {
+  drawLine(data.x, data.y, data.type, data.brush);
+})
 
-if (draws.length > 0) {
-
-}
 
 // socket.on('mousedown', function(data) {
 //   console.log('receiveing');
@@ -41,56 +37,59 @@ const BG_COLOR = "#fff";
 ctx.fillStyle = BG_COLOR;
 ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
+
 let brush = {
   x: 0,
   y: 0,
-  col: "#000",
-  weight: 5,
+  col: picker.value,
+  weight: weight.value,
   fill: false,
 }
 
-let coord = [];
-canvas.addEventListener('mousedown', e => {
-  mousedown(e, brush);
-  let xy = {
-    offsetX: e.offsetX,
-    offsetY: e.offsetY
-  }
-  coords.push(xy);
-  // let data = {
-  //   e: xy,
-  //   brush: brush
-  // }
-  //socket.emit('mousedown', data);
-})
+function updateBrush(brush) {
+  brush.col = picker.value;
+  brush.weight = weight.value;
+  return brush;
+};
 
-canvas.addEventListener("mousemove", e => {
-  mousemove(e, brush);
-  let xy = {
-    offsetX: e.offsetX,
-    offsetY: e.offsetY
-  }
-  if (brush.fill) coords.push(xy);
-  // let data = {
-  //   e: xy,
-  //   brush: brush
-  // }
-  //socket.emit('mousemove', data);
-})
+// canvas.addEventListener('mousedown', e => {
+//   let xy = {
+//     offsetX: e.offsetX,
+//     offsetY: e.offsetY
+//   }
+//   let data = {
+//      e: xy,
+//      brush: brush
+//   }
+//   socket.emit('mousedown', data);
+//   mousedown(e, brush);
+// })
 
-document.addEventListener('mouseup', e => {
-  mouseup(e, brush);
-  let xy = {
-    offsetX: e.offsetX,
-    offsetY: e.offsetY
-  }
-  coords.push(xy);
-  let data = {
-    e: coords,
-    brush: brush
-  }
-  socket.emit('mousedraw', data);
-})
+// canvas.addEventListener("mousemove", e => {
+//   let xy = {
+//     offsetX: e.offsetX,
+//     offsetY: e.offsetY
+//   }
+//   let data = {
+//     e: xy,
+//     brush: brush
+//   }
+//   socket.emit('mousemove', data);
+//   if (brush.fill) mousemove(e, brush);
+// })
+
+// document.addEventListener('mouseup', e => {
+//   let xy = {
+//     offsetX: e.offsetX,
+//     offsetY: e.offsetY
+//   }
+//   let data = {
+//     e: xy,
+//     brush: brush
+//   }
+//   socket.emit('mousedraw', data);
+//   mouseup(e, brush);
+// })
 
 reset.addEventListener('click', e => {
   ctx.fillStyle = "#fff";
@@ -138,13 +137,71 @@ function mouseup(e, stroke) {
   }
 }
 
-function drawLine(x1, y1, x2, y2, stroke) {
-  ctx.fillStyle = stroke.color;
-  ctx.strokeStyle = stroke.color;
-  ctx.lineWidth = stroke.weight;
-  ctx.beginPath();
+canvas.addEventListener('mousedown', e => {
+  socket.emit('draw', {
+    x: e.offsetX,
+    y: e.offsetY,
+    type: 'down',
+    brush: brush
+  })
+  drawLine(e.offsetX, e.offsetY, 'down', brush);
+})
+
+canvas.addEventListener('mousemove', e => {
+  socket.emit('draw', {
+    x: e.offsetX,
+    y: e.offsetY,
+    type: 'drag',
+    brush: brush
+  })
+  drawLine(e.offsetX, e.offsetY, 'drag', brush);
+})
+
+document.addEventListener('mouseup', e => {
+  socket.emit('draw', {
+    x: e.offsetX,
+    y: e.offsetY,
+    type: 'up',
+    brush: brush
+  })
+  drawLine(e.offsetX, e.offsetY, 'up', brush);
+})
+
+// function drawLine(x1, y1, x2, y2, stroke) {
+//   ctx.fillStyle = stroke.color;
+//   ctx.strokeStyle = stroke.color;
+//   ctx.lineWidth = stroke.weight;
+//   ctx.beginPath();
+//   ctx.lineCap = "round";
+//   ctx.moveTo(x1, y1);
+//   ctx.lineTo(x2, y2);
+//   ctx.stroke();
+// }
+
+function drawLine(x, y, type, brush) {
+  ctx.fillStyle = brush.color;
+  ctx.strokeStyle = brush.color;
+  ctx.lineWidth = brush.weight;
   ctx.lineCap = "round";
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke();
+  switch (type) {
+    case 'down':
+      ctx.beginPath();
+      ctx.moveTo(x,y);
+      brush.fill = true;
+      break;
+    case 'drag':
+      if (brush.fill) {
+        ctx.lineTo(x,y);
+        ctx.stroke();
+      }
+      break;
+    case 'up':
+      if (brush.fill) {
+        ctx.lineTo(x,y);
+        ctx.stroke();
+        ctx.closePath();
+      }
+      brush.fill = false;
+      break;
+  }
 }

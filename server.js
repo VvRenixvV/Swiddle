@@ -20,11 +20,17 @@ function newConnection(socket) {
   // socket.on('mousedown', mousedown);
   // socket.on('mousemove', mousemove);
   // socket.on('mouseup', mouseup);
-  socket.on('mousedraw', mousedraw);
+  socket.on('draw', mousedraw);
 
   function mousedraw(data) {
-    socket.broadcast.emit('mousedraw', data);
+    console.log(data);
+    socket.broadcast.emit('draw', data);
   }
+  // socket.on('mousedraw', mousedraw);
+
+  // function mousedraw(data) {
+  //   socket.broadcast.emit('mousedraw', data);
+  // }
 
   // io.sockets.emit('moouse', data) - includes sending client
   // function mousedown(data) {
