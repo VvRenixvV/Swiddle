@@ -1,25 +1,10 @@
 let socket;
 socket = io.connect('http://localhost:3000');
 
-
 socket.on('draw', function(data) {
   drawLine(data.x, data.y, data.type, data.brush);
 })
-
-
-// socket.on('mousedown', function(data) {
-//   console.log('receiveing');
-//   console.log(data.e);
-//   mousedown(data.e, data.brush);
-// });
-// socket.on('mousemove', function(data) {
-//   console.log('receiveing');
-//   mousemove(data.e, data.brush);
-// });
-// socket.on('mouseup', function(data) {
-//   console.log('receiveing');
-//   mouseup(data.e, data.brush);
-// });
+socket.on('reset', resetScr);
 
 let canvas = document.getElementById('screen');
 let ctx = canvas.getContext('2d');
@@ -37,7 +22,6 @@ const BG_COLOR = "#fff";
 ctx.fillStyle = BG_COLOR;
 ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
-
 let brush = {
   x: 0,
   y: 0,
@@ -46,54 +30,9 @@ let brush = {
   fill: false,
 }
 
-function updateBrush(brush) {
-  brush.col = picker.value;
-  brush.weight = weight.value;
-  return brush;
-};
-
-// canvas.addEventListener('mousedown', e => {
-//   let xy = {
-//     offsetX: e.offsetX,
-//     offsetY: e.offsetY
-//   }
-//   let data = {
-//      e: xy,
-//      brush: brush
-//   }
-//   socket.emit('mousedown', data);
-//   mousedown(e, brush);
-// })
-
-// canvas.addEventListener("mousemove", e => {
-//   let xy = {
-//     offsetX: e.offsetX,
-//     offsetY: e.offsetY
-//   }
-//   let data = {
-//     e: xy,
-//     brush: brush
-//   }
-//   socket.emit('mousemove', data);
-//   if (brush.fill) mousemove(e, brush);
-// })
-
-// document.addEventListener('mouseup', e => {
-//   let xy = {
-//     offsetX: e.offsetX,
-//     offsetY: e.offsetY
-//   }
-//   let data = {
-//     e: xy,
-//     brush: brush
-//   }
-//   socket.emit('mousedraw', data);
-//   mouseup(e, brush);
-// })
-
 reset.addEventListener('click', e => {
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
+  resetScr();
+  socket.emit('reset', {});
 });
 
 erase.addEventListener('click', e => {
@@ -113,6 +52,11 @@ picker.addEventListener('change', e => {
   brush.color = picker.value;
 });
 
+
+function resetScr() {
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
+}
 
 function mousedown(e, stroke) {
   stroke.x = e.offsetX;
@@ -167,17 +111,6 @@ document.addEventListener('mouseup', e => {
   drawLine(e.offsetX, e.offsetY, 'up', brush);
 })
 
-// function drawLine(x1, y1, x2, y2, stroke) {
-//   ctx.fillStyle = stroke.color;
-//   ctx.strokeStyle = stroke.color;
-//   ctx.lineWidth = stroke.weight;
-//   ctx.beginPath();
-//   ctx.lineCap = "round";
-//   ctx.moveTo(x1, y1);
-//   ctx.lineTo(x2, y2);
-//   ctx.stroke();
-// }
-
 function drawLine(x, y, type, brush) {
   ctx.fillStyle = brush.color;
   ctx.strokeStyle = brush.color;
@@ -205,3 +138,72 @@ function drawLine(x, y, type, brush) {
       break;
   }
 }
+
+
+
+//previous draw line function using 2 co-ords
+// function drawLine(x1, y1, x2, y2, stroke) {
+//   ctx.fillStyle = stroke.color;
+//   ctx.strokeStyle = stroke.color;
+//   ctx.lineWidth = stroke.weight;
+//   ctx.beginPath();
+//   ctx.lineCap = "round";
+//   ctx.moveTo(x1, y1);
+//   ctx.lineTo(x2, y2);
+//   ctx.stroke();
+// }
+
+// previous event listeners
+// canvas.addEventListener('mousedown', e => {
+//   let xy = {
+//     offsetX: e.offsetX,
+//     offsetY: e.offsetY
+//   }
+//   let data = {
+//      e: xy,
+//      brush: brush
+//   }
+//   socket.emit('mousedown', data);
+//   mousedown(e, brush);
+// })
+
+// canvas.addEventListener("mousemove", e => {
+//   let xy = {
+//     offsetX: e.offsetX,
+//     offsetY: e.offsetY
+//   }
+//   let data = {
+//     e: xy,
+//     brush: brush
+//   }
+//   socket.emit('mousemove', data);
+//   if (brush.fill) mousemove(e, brush);
+// })
+
+// document.addEventListener('mouseup', e => {
+//   let xy = {
+//     offsetX: e.offsetX,
+//     offsetY: e.offsetY
+//   }
+//   let data = {
+//     e: xy,
+//     brush: brush
+//   }
+//   socket.emit('mousedraw', data);
+//   mouseup(e, brush);
+// })
+
+// previous socket listen functions
+// socket.on('mousedown', function(data) {
+//   console.log('receiveing');
+//   console.log(data.e);
+//   mousedown(data.e, data.brush);
+// });
+// socket.on('mousemove', function(data) {
+//   console.log('receiveing');
+//   mousemove(data.e, data.brush);
+// });
+// socket.on('mouseup', function(data) {
+//   console.log('receiveing');
+//   mouseup(data.e, data.brush);
+// });
