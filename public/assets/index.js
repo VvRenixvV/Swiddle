@@ -1,5 +1,6 @@
 let socket;
-socket = io.connect('http://localhost:3000');
+let host = window.location.href || 'http://localhost:3000'
+socket = io.connect(host);
 
 socket.on('draw', function(data) {
   drawLine(data.x, data.y, data.type, data.brush);
