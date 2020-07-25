@@ -1,19 +1,29 @@
 let socket;
 socket = io.connect('http://localhost:3000');
 
-socket.on('mousedown', function(data) {
-  console.log('receiveing');
-  console.log(data.e);
-  mousedown(data.e, data.brush);
+let draws = []
+socket.on('mousedraw', function(data){
+  draws.push(data);
 });
-socket.on('mousemove', function(data) {
-  console.log('receiveing');
-  mousemove(data.e, data.brush);
-});
-socket.on('mouseup', function(data) {
-  console.log('receiveing');
-  mouseup(data.e, data.brush);
-});
+
+
+if (draws.length > 0) {
+
+}
+
+// socket.on('mousedown', function(data) {
+//   console.log('receiveing');
+//   console.log(data.e);
+//   mousedown(data.e, data.brush);
+// });
+// socket.on('mousemove', function(data) {
+//   console.log('receiveing');
+//   mousemove(data.e, data.brush);
+// });
+// socket.on('mouseup', function(data) {
+//   console.log('receiveing');
+//   mouseup(data.e, data.brush);
+// });
 
 let canvas = document.getElementById('screen');
 let ctx = canvas.getContext('2d');
@@ -39,44 +49,47 @@ let brush = {
   fill: false,
 }
 
-
+let coord = [];
 canvas.addEventListener('mousedown', e => {
   mousedown(e, brush);
-  let eve = {
+  let xy = {
     offsetX: e.offsetX,
     offsetY: e.offsetY
   }
-  let data = {
-    e: eve,
-    brush: brush
-  }
-  socket.emit('mousedown', data);
+  coords.push(xy);
+  // let data = {
+  //   e: xy,
+  //   brush: brush
+  // }
+  //socket.emit('mousedown', data);
 })
 
 canvas.addEventListener("mousemove", e => {
   mousemove(e, brush);
-  let eve = {
+  let xy = {
     offsetX: e.offsetX,
     offsetY: e.offsetY
   }
-  let data = {
-    e: eve,
-    brush: brush
-  }
-  if (brush.fill) socket.emit('mousemove', data);
+  if (brush.fill) coords.push(xy);
+  // let data = {
+  //   e: xy,
+  //   brush: brush
+  // }
+  //socket.emit('mousemove', data);
 })
 
-canvas.addEventListener('mouseup', e => {
+document.addEventListener('mouseup', e => {
   mouseup(e, brush);
-  let eve = {
+  let xy = {
     offsetX: e.offsetX,
     offsetY: e.offsetY
   }
+  coords.push(xy);
   let data = {
-    e: eve,
+    e: coords,
     brush: brush
   }
-  socket.emit('mouseup', data);
+  socket.emit('mousedraw', data);
 })
 
 reset.addEventListener('click', e => {
