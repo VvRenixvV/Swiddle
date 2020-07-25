@@ -58,30 +58,7 @@ function resetScr() {
   ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
 }
 
-function mousedown(e, stroke) {
-  stroke.x = e.offsetX;
-  stroke.y = e.offsetY;
-  stroke.fill = true;
-}
-
-function mousemove(e, stroke) {
-  if (stroke.fill) {
-    drawLine(stroke.x, stroke.y, e.offsetX, e.offsetY, stroke);
-    stroke.x = e.offsetX;
-    stroke.y = e.offsetY;
-  }
-}
-
-function mouseup(e, stroke) {
-  if (stroke.fill) {
-    drawLine(stroke.x, stroke.y, e.offsetX, e.offsetY, stroke);
-    stroke.x = 0;
-    stroke.y = 0;
-    stroke.fill = false;
-  }
-}
-
-canvas.addEventListener('mousedown', e => {
+canvas.addEventListener('pointerdown', e => {
   socket.emit('draw', {
     x: e.offsetX,
     y: e.offsetY,
@@ -91,7 +68,7 @@ canvas.addEventListener('mousedown', e => {
   drawLine(e.offsetX, e.offsetY, 'down', brush);
 })
 
-canvas.addEventListener('mousemove', e => {
+canvas.addEventListener('pointermove', e => {
   socket.emit('draw', {
     x: e.offsetX,
     y: e.offsetY,
@@ -101,7 +78,7 @@ canvas.addEventListener('mousemove', e => {
   drawLine(e.offsetX, e.offsetY, 'drag', brush);
 })
 
-document.addEventListener('mouseup', e => {
+document.addEventListener('pointerup', e => {
   socket.emit('draw', {
     x: e.offsetX,
     y: e.offsetY,
@@ -180,6 +157,7 @@ function drawLine(x, y, type, brush) {
 //   if (brush.fill) mousemove(e, brush);
 // })
 
+
 // document.addEventListener('mouseup', e => {
 //   let xy = {
 //     offsetX: e.offsetX,
@@ -207,3 +185,28 @@ function drawLine(x, y, type, brush) {
 //   console.log('receiveing');
 //   mouseup(data.e, data.brush);
 // });
+
+
+// previous mouse functions
+// function mousedown(e, stroke) {
+//   stroke.x = e.offsetX;
+//   stroke.y = e.offsetY;
+//   stroke.fill = true;
+// }
+
+// function mousemove(e, stroke) {
+//   if (stroke.fill) {
+//     drawLine(stroke.x, stroke.y, e.offsetX, e.offsetY, stroke);
+//     stroke.x = e.offsetX;
+//     stroke.y = e.offsetY;
+//   }
+// }
+
+// function mouseup(e, stroke) {
+//   if (stroke.fill) {
+//     drawLine(stroke.x, stroke.y, e.offsetX, e.offsetY, stroke);
+//     stroke.x = 0;
+//     stroke.y = 0;
+//     stroke.fill = false;
+//   }
+// }
