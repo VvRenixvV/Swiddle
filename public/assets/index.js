@@ -1,3 +1,5 @@
+//import { paintBucket } from "./PaintBucket.js";
+
 // SOCKET WORK
 let socket;
 let host = window.location.href || 'http://localhost:3000'
@@ -12,7 +14,7 @@ socket.on('reset', resetScr);
 const WIN_WIDTH = window.innerWidth;
 const WIN_HEIGHT = window.innerHeight;
 const SCR_WIDTH = 800;
-const SCR_HEIGHT = 600;
+const SCR_HEIGHT = 400;
 const BG_COLOR = "#fff";
 
 // VARIABLES
@@ -24,6 +26,7 @@ let erase = document.getElementById('erase');
 let paint = document.getElementById('paint');
 let weight = document.getElementById('weight');
 let picker = document.getElementById('color');
+let bucket = document.getElementById('bucket');
 
 let brush = {
   x: 0,
@@ -32,13 +35,13 @@ let brush = {
   weight: weight.value,
   fill: false,
 }
+let fill = false;
 
 // BACKGROUND WORK
 ctx.fillStyle = BG_COLOR;
 ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
 // EVENT LISTENERS 
-
 reset.addEventListener('click', e => {
   resetScr();
   socket.emit('reset', {});
@@ -61,14 +64,26 @@ picker.addEventListener('change', e => {
   brush.color = picker.value;
 });
 
-canvas.addEventListener('pointerdown', e => {
-  socket.emit('draw', {
-    x: e.offsetX,
-    y: e.offsetY,
-    type: 'down',
-    brush: brush
-  })
-  drawLine(e.offsetX, e.offsetY, 'down', brush);
+bucket.addEventListener('click', e => {
+  fill = fill ? false : true;
+  console.log(fill);
+})
+
+canvas.addEventListener('mousedown', e => {
+  if (fill) {
+    let img = ctx.getImageData(0, 0, SCR_WIDTH, SCR_HEIGHT);
+    let x = e.offsetX;
+    let y = e.offsetY;
+    paintBucket([x, y], img);
+  } else {
+    socket.emit('draw', {
+      x: e.offsetX,
+      y: e.offsetY,
+      type: 'down',
+      brush: brush
+    })
+    drawLine(e.offsetX, e.offsetY, 'down', brush);
+  };
 })
 
 canvas.addEventListener('pointermove', e => {
@@ -92,9 +107,8 @@ document.addEventListener('pointerup', e => {
 })
 
 // FUNCTIONS 
-
 function resetScr() {
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = BG_COLOR;
   ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
 }
 
@@ -126,6 +140,76 @@ function drawLine(x, y, type, brush) {
   }
 }
 
+
+//console.log(ctx.getImageData(0,0,SCR_WIDTH, SCR_HEIGHT).data.length);
+
+function paintBucket(stack, img) {
+  let imgData = img;
+  let pixelStack = [stack];
+  console.log(pixelStack.length);
+
+  while (pixelStack.length > 0) {
+    let newPos = pixelStack.pop();
+    let x = newPos[0];
+    let y = newPos[1];
+    let pixelPos = (y * SCR_WIDTH + x) * 4;
+    while (y >= 0 && matchStartCol(pixelPos)) {
+      y -= 1;
+      pixelPos -= SCR_WIDTH * 4;
+    }
+    pixelPos += SCR_WIDTH * 4;
+    ++y;
+    let reachLeft = false;
+    let reachRight = false;
+    while (y < SCR_HEIGHT && matchStartCol(pixelPos)) {
+      y += 1;
+      imgData = paintPixel(pixelPos);
+
+      // check left for fill
+      if (x > 0) {
+        if (matchStartCol(pixelPos - 4)) {
+          if (!reachLeft) {
+            pixelStack.push([x - 1, y]);
+            reachLeft = true;
+          }
+        } else if (reachLeft) {
+          reachLeft = false;
+        }
+      }
+
+      // check right for fill
+      if (x < SCR_WIDTH - 1) {
+        if (matchStartCol(pixelPos + 4)) {
+          if (!reachRight) {
+            pixelStack.push([x + 1, y]);
+            reachRight = true;
+          }
+        } else if (reachRight) {
+          reachRight = false;
+        }
+      }
+      pixelPos += SCR_WIDTH * 4;
+    }
+  }
+  console.log(imgData.data);
+  ctx.putImageData(imgData, 0, 0);
+
+  function matchStartCol(pos) {
+    let r = imgData.data[pos];
+    let g = imgData.data[pos + 1];
+    let b = imgData.data[pos + 2];
+
+    return r === 255 && g === 255 && b === 255;
+  }
+
+  function paintPixel(pos) {
+    imgData.data[pos] = 45;
+    imgData.data[pos + 1] = 167;
+    imgData.data[pos + 2] = 93;
+    imgData.data[pos + 3] = 255;
+    return imgData;
+  }
+}
 
 
 //previous draw line function using 2 co-ords
