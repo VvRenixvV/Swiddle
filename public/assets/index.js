@@ -1,3 +1,4 @@
+// SOCKET WORK
 let socket;
 let host = window.location.href || 'http://localhost:3000'
 socket = io.connect(host);
@@ -7,7 +8,15 @@ socket.on('draw', function(data) {
 })
 socket.on('reset', resetScr);
 
-let canvas = document.getElementById('screen');
+// CONSTANTS
+const WIN_WIDTH = window.innerWidth;
+const WIN_HEIGHT = window.innerHeight;
+const SCR_WIDTH = 800;
+const SCR_HEIGHT = 600;
+const BG_COLOR = "#fff";
+
+// VARIABLES
+let canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
 
 let reset = document.getElementById('reset');
@@ -16,13 +25,6 @@ let paint = document.getElementById('paint');
 let weight = document.getElementById('weight');
 let picker = document.getElementById('color');
 
-const SCR_WIDTH = 800;
-const SCR_HEIGHT = 600;
-const BG_COLOR = "#fff";
-
-ctx.fillStyle = BG_COLOR;
-ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
-
 let brush = {
   x: 0,
   y: 0,
@@ -30,6 +32,12 @@ let brush = {
   weight: weight.value,
   fill: false,
 }
+
+// BACKGROUND WORK
+ctx.fillStyle = BG_COLOR;
+ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
+
+// EVENT LISTENERS 
 
 reset.addEventListener('click', e => {
   resetScr();
@@ -52,12 +60,6 @@ weight.addEventListener('change', e => {
 picker.addEventListener('change', e => {
   brush.color = picker.value;
 });
-
-
-function resetScr() {
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
-}
 
 canvas.addEventListener('pointerdown', e => {
   socket.emit('draw', {
@@ -88,6 +90,13 @@ document.addEventListener('pointerup', e => {
   })
   drawLine(e.offsetX, e.offsetY, 'up', brush);
 })
+
+// FUNCTIONS 
+
+function resetScr() {
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
+}
 
 function drawLine(x, y, type, brush) {
   ctx.fillStyle = brush.color;

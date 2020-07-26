@@ -24,7 +24,6 @@ function newConnection(socket) {
   socket.on('draw', mousedraw);
 
   function mousedraw(data) {
-    console.log(data);
     socket.broadcast.emit('draw', data);
   }
   // socket.on('mousedraw', mousedraw);
