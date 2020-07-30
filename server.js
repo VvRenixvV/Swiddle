@@ -1,6 +1,6 @@
-let express = require('express');
+const express = require('express');
 
-let app = express();
+const app = express();
 let port = process.env.PORT || 3000;
 let server = app.listen(port);
 
@@ -22,9 +22,14 @@ function newConnection(socket) {
   // socket.on('mousemove', mousemove);
   // socket.on('mouseup', mouseup);
   socket.on('draw', mousedraw);
+  socket.on('newMsg', sendMsg);
 
   function mousedraw(data) {
     socket.broadcast.emit('draw', data);
+  }
+
+  function sendMsg(data) {
+    socket.broadcast.emit('newMsg', data);
   }
   // socket.on('mousedraw', mousedraw);
 
