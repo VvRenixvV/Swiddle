@@ -1,9 +1,9 @@
 import Game from "./Game.js";
-import Chat from "./Chat.js";
+import Chat from "./ChatApp.js";
 
 // SOCKET STUFF
 let socket;
-let host = window.location.href || 'http://localhost:3000'
+let host = window.location.href || 'http://localhost:3000/new'
 socket = io.connect(host);
 
 
@@ -16,12 +16,12 @@ join.onclick = function(e) {
   console.log(room.value);
   // if(room.value && room.value === "swid123"){
     form.style.display = 'none';
-    container.style.display = "block";
+    container.style.display = "flex";
   // }
 }
 
 new Game(socket);
-new Chat(socket);
+//new Chat(socket);
 
 
 

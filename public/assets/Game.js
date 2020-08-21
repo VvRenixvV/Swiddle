@@ -1,11 +1,5 @@
 export default class Game {
   constructor(socket) {
-    // SOCKET WORK
-    socket.on('draw', function(data) {
-      drawLine(data.x, data.y, data.type, data.brush);
-    })
-    socket.on('reset', resetScr);
-
     let container = document.getElementById('container');
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
@@ -41,6 +35,14 @@ export default class Game {
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
+    // SOCKET WORK
+    socket.on('draw', function(data) {
+      drawLine(data.x, data.y, data.type, data.brush);
+    })
+    socket.on('reset', function(data) {
+      resetScr();
+    });
+
     // EVENT LISTENERS 
     // window.addEventListener('resize', e => {
     //   canvas.width = container.clientWidth;
@@ -71,7 +73,7 @@ export default class Game {
     });
 
     picker.addEventListener('change', e => {
-      brush.color = picker.value;
+      brush.col = picker.value;
       filler.col = picker.value;
     });
 

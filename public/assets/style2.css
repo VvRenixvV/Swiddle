@@ -1,0 +1,47 @@
+* {
+  font-size: large  ;
+}
+
+.container {
+  display: none;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-content: center;
+  text-align: center;
+}
+
+#canvas {
+  border: 1px solid black;
+  box-shadow: 10px 10px 10px grey;
+  margin: 50px 20px;
+  border-radius: 5%;
+}
+
+.tool {
+  font-size: 30px;
+  border: none;
+  background-color: royalblue;
+  color: white;
+  width: 100px;
+  margin: 0px 20px;
+  border-radius: 5%;
+  box-shadow: 5px 5px 5px grey;
+  transition: 0.2s ease;
+}
+
+.tool:hover {
+  box-shadow: 7px 7px 10px grey;
+  background-color: slateblue;
+  width: 140px;
+}
+
+.settings {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+label {
+  font-size: 30px;
+}
+
+
