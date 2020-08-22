@@ -35,6 +35,7 @@ function newConnection(socket) {
   socket.on('draw', mousedraw);
   socket.on('newMsg', sendMsg);
   socket.on('reset', reset);
+  socket.on('fill', fillCanvas);
 
   function mousedraw(data) {
     socket.broadcast.emit('draw', data);
@@ -46,6 +47,10 @@ function newConnection(socket) {
 
   function reset(data) {
     socket.broadcast.emit('reset', data);
+  }
+
+  function fillCanvas(data) {
+    socket.broadcast.emit('fill', data);
   }
   // socket.on('mousedraw', mousedraw);
 

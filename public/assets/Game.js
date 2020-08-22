@@ -42,6 +42,10 @@ export default class Game {
     socket.on('reset', function(data) {
       resetScr();
     });
+    socket.on('fill', function(data){
+      let img = ctx.getImageData(0, 0, SCR_WIDTH, SCR_HEIGHT)
+      paintBucket([data.x, data.y], img, data.fill);
+    })
 
     // EVENT LISTENERS 
     // window.addEventListener('resize', e => {
@@ -89,7 +93,12 @@ export default class Game {
         let x = e.offsetX;
         let y = e.offsetY;
         console.log(x, y);
-        paintBucket([x, y], img);
+        socket.emit('fill', {
+          x: x,
+          y: y,
+          fill: filler
+        })
+        paintBucket([x, y], img, filler);
       } else {
         socket.emit('draw', {
           x: e.offsetX,
@@ -158,7 +167,7 @@ export default class Game {
 
     //console.log(ctx.getImageData(0,0,SCR_WIDTH, SCR_HEIGHT).data.length);
 
-    function paintBucket(stack, img) {
+    function paintBucket(stack, img, filler) {
       let imgData = img;
       let startPos = (stack[1] * SCR_WIDTH + stack[1])*4;
       let startR = img.data[startPos];
